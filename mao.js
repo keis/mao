@@ -2,6 +2,17 @@ var Module = require('module'),
     path = require('path'),
     loading = {};
 
+function parseComponent(str) {
+    var component = {name: str},
+        parts = str.split('.');
+
+    if (parts.length > 1) {
+        component.module = parts[0];
+        component.attribute = parts.slice(1).join('.');
+    }
+
+    return component;
+}
 
 function mao(config, context) {
     var parentModule = new Module('mao-context'),
@@ -15,16 +26,8 @@ function mao(config, context) {
     context = context || {};
 
     config.application.forEach(function (component) {
-        var parts;
-
         if (typeof component == 'string') {
-            component = {name: component}
-        }
-
-        parts = component.name.split('.');
-        if (parts.length > 1) {
-            component.module = component.module || parts[0];
-            component.attribute = component.attribute || parts.slice(1).join('.');
+            component = parseComponent(component);
         }
 
         application[component.name] = component;
@@ -55,7 +58,7 @@ function mao(config, context) {
             return inst;
         }
 
-        return target.exports;       
+        return target.exports;
     }
 
     return self = {
@@ -104,7 +107,7 @@ function mao(config, context) {
             process.nextTick(function () {
                 callback && callback();
             });
-        }   
+        }
     };
 }
 
